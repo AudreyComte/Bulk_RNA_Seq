@@ -60,10 +60,14 @@ if (thread_param > 1) {
     register(MulticoreParam(thread_param))
     parallel <- TRUE
 }
+
+file_list <- strsplit(input, ",")[[1]]
+
 # Loading the parameters
 # nom d'une condition : "dorsolized_torso"
-ref_level = param1_ref_level
-normalized_counts_file = output_1
+
+ref_level <- param1_ref_level
+normalized_counts_file <- output_1
 
 # Rename column name of the count matrix as coldata
 # colData and countData must have the same sample order

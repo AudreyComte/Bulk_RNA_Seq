@@ -62,19 +62,19 @@ if (thread_param > 1) {
 }
 # Loading the parameters
 # nom d'une condition : "dorsolized_torso"
-ref_level = param1_ref_level
-normalized_counts_file = output_1
+ref_level <- param1_ref_level
+normalized_counts_file <- output_1
 
 # Rename column name of the count matrix as coldata
 # colData and countData must have the same sample order
-cts <- as.matrix(read.table(input, header=T, row.names = 1))
-coldata_read <- read.delim(param2_coldata, header=TRUE, comment.char="#", quote="")
-colnames(cts) <- coldata_read[,1]
+#cts <- as.matrix(read.table(input, header=T, row.names = 1))
+#coldata_read <- read.delim(param2_coldata, header=TRUE, comment.char="#", quote="")
+#colnames(cts) <- coldata_read[,1]
 
-coldata <- coldata_read[,-1]
-rownames(coldata) <- coldata_read[,1]
-coldata$condition <- factor(coldata_read$condition)
-coldata$type <- factor(coldata_read$type)
+#coldata <- coldata_read[,-1]
+#rownames(coldata) <- coldata_read[,1]
+#coldata$condition <- factor(coldata_read$condition)
+#coldata$type <- factor(coldata_read$type)
 
 #rmproj_list = as.list(strsplit(param3_rmproj_list, ",")[[1]])
 
@@ -87,14 +87,17 @@ coldata$type <- factor(coldata_read$type)
 #}
 
 # Check that sample names match in both files
-if (all(colnames(cts) %in% rownames(coldata)) & all(colnames(cts) == rownames(coldata))){
+#if (all(colnames(cts) %in% rownames(coldata)) & all(colnames(cts) == rownames(coldata))){
   # Create the DESeq2 object
-  dds <- DESeqDataSetFromMatrix(countData = cts,
-                                colData = coldata,
-                                design = ~ condition)
-} else {
-  print("sample names doesn't match in both files")
-}
+dds <- DESeqDataSetFromMatrix(countData = input,
+                              colData = coldata,
+                              design = ~ condition)
+
+
+
+#} else {
+  #print("sample names doesn't match in both files")
+#}
 
 # Remove uninformative columns (to do when filter not already done with the CPM threshold)
 #dds <- dds[ rowSums(counts(dds)) > 10, ]

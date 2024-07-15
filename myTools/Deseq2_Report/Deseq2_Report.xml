@@ -1,0 +1,47 @@
+<tool id="Deseq2_Report" name="Deseq2_Report" version="1.0+galaxy1" python_template_version="3.5" profile="21.05">
+    <description>Expression differentielle Report</description>
+    <requirements>
+        <requirement type="package" >r-base</requirement>
+        <requirement type="package" >r-dplyr</requirement>
+        <requirement type="package" >r-patchwork</requirement>
+        <requirement type="package" >jinja2</requirement>
+        <requirement type="package" >networkx</requirement>
+        <requirement type="package" >pygraphviz</requirement>
+        <requirement type="package" >pygments</requirement>
+        <requirement type="package" >graphviz=</requirement>
+        <requirement type="package" >xorg-libxrender</requirement>
+        <requirement type="package" >xorg-libxpm</requirement>
+        <requirement type="package" >r-rmarkdown</requirement>
+        <requirement type="package" >r-tidyverse</requirement>
+        <requirement type="package" >bioconductor-deseq2</requirement>
+        <requirement type="package" >r-plotly</requirement>
+        <requirement type="package" >r-htmlwidgets</requirement>
+        <requirement type="package" >r-ggplot2</requirement>
+        <requirement type="package" >r-pheatmap</requirement>
+        <requirement type="package" >r-rcolorbrewer</requirement>
+        <requirement type="package" >r-dt</requirement>
+        <requirement type="package" >bioconductor-apeglm</requirement>
+        <requirement type="package" >bioconductor-pcaexplorer</requirement>
+        <requirement type="package" >bioconductor-enhancedvolcano</requirement>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[
+        Rscript /home/audrey/Documents/Bulk_RNAseq_analyses/galaxy/tools/myTools/Deseq2_Report/diffexp_reports_compilation_galaxy.R --galaxy_input1 $rds --galaxy_output1 $diffexp --galaxy_output2 $all_genes_stats --galaxy_output3 $signif_down_regulated --galaxy_output4 $signif_up_regulated --galaxy_param1 $gene_name --galaxy_param2 $ref_level --galaxy_param3 $lfcshrink_type --galaxy_param4 $FCcutoff --galaxy_param5 $pCcutoff --galaxy_param6 $mutant_level --galaxy_param7 $nbpval --galaxy_param8 $sample_table
+    ]]></command>
+    <inputs>
+        <param type="data" name="rds" label="rds"/>
+        <param type="text" name="gene_name" value=" " label="gene_name" help=" "/>
+        <param type="text" name="ref_level" value="Dorsalized" label="ref_level" help="Reference to do the comparison"/>
+        <param type="text" name="lfcshrink_type" value="apeglm" label="lfcshrink_type" help=" "/>
+        <param type="integer" name="FCcutoff" value="2" label="FCcutoff" help=" "/>
+        <param type="float" name="pCcutoff" value="0.01" label="pCcutoff" help=" "/>
+        <param type="text" name="mutant_level" value="Dorsalized_torso" label="mutant_level" help=" "/>
+        <param type="integer" name="nbpval" value="50" label="nbpval" help=" "/>
+        <param type="data" name="sample_table" label="sample_table" help=" "/>
+    </inputs>
+    <outputs>
+        <data name="diffexp" format="html" label="diffexp" />
+        <data name="all_genes_stats" format="tsv" label="${mutant_level}_vs_${ref_level}_all_genes_stats" />
+        <data name="signif_down_regulated" format="txt" label="${mutant_level}_vs_${ref_level}_signif_down_regulated" />
+        <data name="signif_up_regulated" format="txt" label="${mutant_level}_vs_${ref_level}_signif_up_regulated" />
+    </outputs>
+</tool>

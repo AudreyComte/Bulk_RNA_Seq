@@ -62,64 +62,33 @@ if (thread_param > 1) {
 }
 
 file_list <- strsplit(input, ",")[[1]]
-
-# Loading the parameters
-# nom d'une condition : "dorsolized_torso"
-
 ref_level <- param1_ref_level
 normalized_counts_file <- output_1
 
-# Rename column name of the count matrix as coldata
-# colData and countData must have the same sample order
-cts <- as.matrix(read.table(input, header=T, row.names = 1))
-coldata_read <- read.delim(param2_coldata, header=TRUE, comment.char="#", quote="")
-colnames(cts) <- coldata_read[,1]
-
-coldata <- coldata_read[,-1]
-rownames(coldata) <- coldata_read[,1]
-coldata$condition <- factor(coldata_read$condition)
-coldata$type <- factor(coldata_read$type)
-
-#rmproj_list = as.list(strsplit(param3_rmproj_list, ",")[[1]])
-
-
-#if(length(rmproj_list)!=0){
-  #for (i in 1:length(rmproj_list)) {
-      #name <- rmproj_list[[i]]
-      #coldata <- coldata[-match((name), table = rownames(coldata)), ]
-  #}
-#}
-
-# Check that sample names match in both files
-if (all(colnames(cts) %in% rownames(coldata)) & all(colnames(cts) == rownames(coldata))){
-  # Create the DESeq2 object
+for (i in 1:length(file_list)) {
+  cts <- file_list[i]
   dds <- DESeqDataSetFromMatrix(countData = cts,
-                                colData = coldata,
-                                design = ~ condition)
-} else {
-  print("sample names doesn't match in both files")
+                              colData = param2_coldata,
+                              design = ~ condition)
+
+  sample_names_cts <- colnames(cts)
+  sample_names_coldata <- rownames(param2_coldata)
+
+  conditions <- unique(param2_coldata[sample_names_cts, "condition"])
+
+  reference_1 <- conditions[1]
+  reference_2 <- conditions[2]
+  
+  for (c in 1:2){
+    dds$condition <- relevel(dds$condition, ref = reference_,c)
+    dds <- DESeq(dds, parallel = parallel)
+    all_rds = output_2
+    saveRDS(dds, file = all_rds)
+    dds <- estimateSizeFactors( dds)
+    print(sizeFactors(dds))
+    # Save the normalized data matrix
+    normalized_counts <- counts(dds, normalized=TRUE)
+    write.table(normalized_counts, file = normalized_counts_file, sep="\t", quote=F, col.names=NA)
+  }
 }
 
-# Remove uninformative columns (to do when filter not already done with the CPM threshold)
-#dds <- dds[ rowSums(counts(dds)) > 10, ]
-
-# Specifying the reference level
-dds$condition <- relevel(dds$condition, ref = ref_level)
-
-# DESeq : Normalization and preprocessing (counts divided by sample-specific size factors
-# determined by median ratio of gene counts relative to geometric mean per gene)
-dds <- DESeq(dds, parallel = parallel)
-# To save the object in a file for later use
-all_rds = output_2
-saveRDS(dds, file = all_rds)
-
-# Already done in the DESeq function
-dds <- estimateSizeFactors( dds)
-print(sizeFactors(dds))
-# Save the normalized data matrix
-normalized_counts <- counts(dds, normalized=TRUE)
-write.table(normalized_counts, file = normalized_counts_file, sep="\t", quote=F, col.names=NA)
-
-# File to complete the snakemake rule
-deseq2_init_output = output_3
-writeLines(c("deseq2_init step done"), deseq2_init_output)
